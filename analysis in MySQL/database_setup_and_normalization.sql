@@ -158,7 +158,8 @@ DROP TABLE original_sales_data;
 
 SHOW TABLES;
 
--- did something here. I cooked!
+-- Cleaning the data
+-- Removing the carriage returns and newlines in the sales_classification column
 SET SQL_SAFE_UPDATES = 0;
 
 UPDATE sales 

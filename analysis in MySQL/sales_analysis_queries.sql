@@ -162,7 +162,11 @@ FROM cars_info;
 
 /*
 Insights from this section:
-The data highlights a "Standardized Engineering" philosophy. Despite offering a wide range of models, the average engine size remains remarkably stable at 3.2L, even when switching between fuel types like Petrol and Hybrid. This suggests that BMW prioritizes a consistent "performance feel" across its entire lineup. The data also shows that Hybrid cars are the most expensive, costing about $74,798 on average. Interestingly, whether a car has a Manual or Automatic transmission doesn't change the price; both types cost around $75,000. Additionally, the 16-year age spread of the fleet shows a healthy balance between "Legacy" models that maintain brand heritage and "Modern" entries that introduce new technologies.
+The data highlights a "Standardized Engineering" philosophy. Despite offering a wide range of models, the average engine size remains remarkably stable at 3.2L, even when switching between fuel types like Petrol and Hybrid. 
+This suggests that BMW prioritizes a consistent "performance feel" across its entire lineup. 
+The data also shows that Hybrid cars are the most expensive, costing about $74,798 on average. 
+Interestingly, whether a car has a Manual or Automatic transmission doesn't change the price; both types cost around $75,000. 
+Additionally, the 16-year age spread of the fleet shows a healthy balance between "Legacy" models that maintain brand heritage and "Modern" entries that introduce new technologies.
 */
 
 
@@ -203,24 +207,24 @@ FROM cars_info c
 JOIN sales s ON c.car_id = s.car_id
 GROUP BY c.Model
 ORDER BY total_sales DESC;
--- Result: The 7 Series has the highest total sales volume in the dataset - 23,786,466 USD
+-- Result: The 7 Series has the highest total sales volume in the dataset - 23,786,466
 
 
 -- Question: Which fuel type is the market leader in each global sales region?
 WITH region_fuel_ranking AS(
 SELECT s.Region,f.fuel_type,
-COUNT(c.car_id) AS fuel_type_count, 
-ROW_NUMBER() OVER (PARTITION BY s.Region ORDER BY COUNT(c.car_id) DESC) AS serial_number 
+SUM(s.sales_volume) AS sales_volume, 
+ROW_NUMBER() OVER (PARTITION BY s.Region ORDER BY SUM(s.sales_volume) DESC) AS serial_number 
 FROM fuel_types_info f 
 JOIN cars_info c ON f.Fuel_type_id = c.Fuel_type_id
 JOIN sales s ON c.car_id = s.car_id
 GROUP BY s.Region,f.fuel_type
 )
-SELECT region, fuel_type, fuel_type_count
+SELECT region, fuel_type, sales_volume
 FROM region_fuel_ranking
 WHERE serial_number = 1;
--- Result: Hybrid technology is the dominant market leader in four out of six global regions. The only exceptions are Middle East and 'South America', where Petrol remains the preferred fuel type.
-
+-- Result: The analysis reveals a highly fragmented global market where fuel type dominance varies significantly by geography. 
+-- There is no single 'global winner,' suggesting that regional infrastructure and consumer policy heavily influence vehicle adoption.
 
 -- Question: Which specific BMW models are available with a Diesel powerplant within the Asia sales region?
 SELECT DISTINCT c.model 
@@ -245,19 +249,19 @@ LIMIT 1;
 WITH region_fuel_ranking AS
 (
 SELECT s.Region,f.fuel_type,
-COUNT(c.car_id) AS fuel_type_count, 
-ROW_NUMBER() OVER (PARTITION BY s.Region ORDER BY COUNT(c.car_id) DESC) AS serial_number 
+SUM(s.sales_volume) AS sales_volume, 
+ROW_NUMBER() OVER (PARTITION BY s.Region ORDER BY SUM(s.sales_volume) DESC) AS serial_number 
 FROM fuel_types_info f 
 JOIN cars_info c ON f.Fuel_type_id = c.Fuel_type_id
 JOIN sales s ON c.car_id = s.car_id
 WHERE fuel_type IN ('Electric', 'Diesel')
 GROUP BY s.Region, f.fuel_type
 )
-SELECT Region, fuel_type, fuel_type_count
+SELECT Region, fuel_type, sales_volume
 FROM region_fuel_ranking
 WHERE serial_number = 1;
 -- Result: The majority of global regions now show a higher volume of Electric vehicles compared to Diesel.
--- The regions that prefer Electric vehicles are: Africa, Europe, North America and South America.
+-- The regions that prefer Electric vehicles are: Africa, Asia, Europe and North America.
 
 
 -- Question: What is the revenue market share of each transmission type (Automatic vs. Manual) within each global sales region?
@@ -278,7 +282,10 @@ FROM region_revenue;
 
 /*
 Insights  from this section:
-The world is moving away from Diesel and toward Electric and Hybrid power. Electric cars now outsell Diesel in most parts of the world, including Europe and North America. Hybrids are the overall leaders in 4 out of 6 global regions. While most models in the data sell in smaller numbers, there are 11 "hero" models like the expensive 7 Series, X3 mdoel and others that make up the core of BMW’s business. Finally, BMW drivers are perfectly split down the middle: 50% of revenue comes from people who want an Automatic, and the other 50% comes from those who prefer a Manual.
+BMW’s sales are driven by a core group of 11 high-performing models, led by the 7 Series, which dominates the dataset with over 23 million units sold. 
+While Petrol remains the most popular fuel source overall with 63 million units, the global market is highly fragmented; Electric vehicles have successfully overtaken Diesel in most major regions, though Asia maintains a diverse lineup of 11 unique Diesel models. 
+Interestingly, consumer driving habits vary by geography, with North America recording the highest average vehicle mileage globally.
+Despite these regional differences in fuel and distance, driver preference for Transmission remains perfectly balanced, with a 50/50 split between Automatic and Manual across every single region, proving that BMW successfully appeals to both comfort-seekers and driving enthusiasts alike.
 */
 
 
